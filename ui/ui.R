@@ -10,7 +10,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       # Add input elements (e.g., selectInput, sliderInput) for user interaction
-      selectInput("selected_event", "Select Event ID", choices = c("7_N10", "other_event_IDs")),
+      selectInput("selected_event", "Select Event ID", choices = c),
       # Add more inputs if needed
     ),
     
@@ -32,3 +32,4 @@ ui <- fluidPage(
     )
   )
 )
+
