@@ -3,28 +3,26 @@ suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(shinydashboard))
 suppressPackageStartupMessages(library(arrow))
 suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggridges))
 
 #-- UI -------------------------------------------------------------------------#
-# UI
 ui <- dashboardPage(
+  skin = "yellow",
   dashboardHeader(title = "🦞Lobster Predation Behaviour"), 
   dashboardSidebar(
     # Add a text box with key explanation
     div(style = "border: 1px solid #ccc; padding: 10px; margin-top: 10px;",
         p("Welcome to the Lobster Predation Behaviour Dashboard!"),
-        p("Use the sidebar menu to navigate between different sections."),
+        #p("Use the sidebar menu to navigate between different sections."),
         p("Select a tank from the radio buttons and an event ID from the dropdown."),
-        p("Explore the data and visualizations for each section.")
+        #p("Explore the data and visualizations for each section.")
     ),
 
     # add an about tab
-    sidebarMenu(
-      menuItem("About", tabName = "about", icon = icon("info-circle"))
-    ),
-    # add a visualisations tab
-    sidebarMenu(
-      menuItem("Visualisations", tabName = "visualisations", icon = icon("chart-bar"))
-    ),
+    #sidebarMenu(
+      #menuItem("About", tabName = "about", icon = icon("info-circle")),
+      #menuItem("Visualisations", tabName = "visualisations", icon = icon("chart-bar"))
+    #),
 
     # Add a radio button for tank selection
     radioButtons("tank_selection", "Select Tank",
@@ -36,27 +34,30 @@ ui <- dashboardPage(
   dashboardBody(
     # About tab content
     tabItem(tabName = "about",
-            h2("💡About💡"),
+            h1("💡About"),
             p("This research project focuses on understanding the predation behavior between lobsters and sea urchins in Tasmanian waters, 
             which are experiencing significant warming and species redistribution. The long-spined sea urchin, Centrostephanus rodgersii, 
             has extended its range in Tasmanian coastal waters, leading to over-grazing and unproductive barren habitats."),
             p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of C. rodgersii in its natural range. 
             However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins bythe eastern rock lobster"),
             p("This dashboard allows you to explore the data collected from the experiments and visualise the results."),
-            p("@slopezmarcano and @jesmith5"),
+            p("@slopezmarcano and @jesmith5")
             # Add an image for the "About" section that is located in the assets folder
-            img(src = "assets/lobster.png", height = 200, width = 200, align = "center")
+            #img(src = "https://www.dpi.nsw.gov.au/__data/assets/image/0018/117540/lobster.jpg", height = 200, width = 200, align = "center")
     ), 
     # Add a tab for all the plots
     tabItem(tabName = 'visualisations',
-            h2("📊Visualisations📊"),
+            h1("📊Visualisations"),
             fluidRow(
-              box(title = 'Urchin Timeline', plotOutput("count_plot", height = 300)),
-              box(title = 'Predation Motifs in Event_ID', plotOutput("motif_count_plot", height = 300))),
+              #column(width = 12, h4('No of Urchins in Event_ID')),column(width = 12, 
+              box(collapsible = TRUE, status = "warning", title= 'No of Urchins in Event_ID', verbatimTextOutput("max_urchin_count_output"), height = 150)),
             fluidRow(
-              column(12, h3("Behavioural Sequences Across Predation Motifs")),
-              column(12, plotOutput("interaction_plot", height = 600)))))
-  )
+              column(width=12, h4("Predation Motifs in Event_ID")),
+              box(collapsible = TRUE, status = "warning",  title="Time when Motifs ocurred",  plotOutput("time_motif_plot", height = 300)),
+              box(collapsible = TRUE, status = "warning", title="Number of Motifs in Event_ID", plotOutput("motif_count_plot", height = 300))),
+            fluidRow(
+              column(width=12, h4("Behavioural Sequences Across Predation Motifs")),
+              column(width=12, plotOutput("interaction_plot", height = 600))))))
 
 
 #-- Server ---------------------------------------------------------------------#
@@ -81,7 +82,7 @@ server <- function(input, output, session) {
   source('scripts/final_functions.R')
   
   # Load the ggpplot themes
-  source('scripts/templates/yyy_theme_setup.R')
+  #source('scripts/templates/yyy_theme_setup.R')
   
   # Suppress the dplyr summarise() messages
   options(dplyr.summarise.inform = FALSE)
@@ -111,14 +112,16 @@ server <- function(input, output, session) {
               summarise(min_frame = min(correct_frame), max_frame = max(correct_frame))
 
       # For all interaction groups or motifs in the selected event_ID, establish a consistent time sequence.
-      data3 <- left_join(data1, frames, by = "event_ID", multiple = "all") %>%
+      data3 <- data1 %>% 
+        left_join(frames, by = "event_ID", relationship='many-to-many')  %>%
         filter(between(correct_frame, min_frame, max_frame)) %>%
         select(-min_frame, -max_frame) %>%
         group_by(event_ID, group, subgroup = round(correct_frame / n(), 1)) %>%
         add_count() %>%
         ungroup() %>%
         group_by(event_ID, group) %>%
-        mutate(correct_subgroup = dense_rank(subgroup) - 1)
+        mutate(correct_subgroup = dense_rank(subgroup) - 1) %>%
+        mutate(minute = correct_frame * 0.001389)
         
 
     return(data3)
@@ -134,8 +137,8 @@ server <- function(input, output, session) {
     geom_point(
     size = 4,
     alpha = 1) +
-    scale_color_gradient2(low = "#c50404", mid = "#ffc251", high = "#1d891d") +
-    #theme_minimal()+
+    scale_color_gradient2(low = "#c50404", mid = "#e9c46a", high = "#2a9d8f") +
+    theme_light()+
     facet_wrap(~ group, ncol = 4)+
     labs(shape='Species', color = "Time Sequence") +
     xlab("X Coordinate") +
@@ -143,20 +146,10 @@ server <- function(input, output, session) {
     scale_shape_manual(values = c(0, 2), labels = c("Urchin", "Lobster"))
   })
 
-output$count_plot <- renderPlot({
-  # Access the filtered data using filtered_data()
-  filtered_data <- filtered_data()
-
-  # Perform ggplot and show the count of urchin for the selected event_ID across the correct_frame
-  ggplot(filtered_data %>% group_by(category_id, correct_frame) %>% count() %>% filter(category_id==0), 
-  aes(x = correct_frame, y = n)) +
-  geom_line(size = 2, position = position_dodge(1)) +
-  labs(color = "Species") +
-  xlab("Frame Number") +
-  ylab("Urchin Count") +
-  scale_y_continuous(limits = c(0,3)) +
-  scale_color_manual(values = c("#037563"))
-})
+output$max_urchin_count_output <- renderPrint({
+    max_urchin_count <- filtered_data() %>% filter(category_id=='0') %>% group_by(correct_frame) %>% count() %>% pull(n) %>% max()
+    paste("The urchin MaxN in", input$event_id, "is", max_urchin_count)
+  })
 
 output$motif_count_plot <- renderPlot({
   # Access the filtered data using filtered_data()
@@ -164,12 +157,25 @@ output$motif_count_plot <- renderPlot({
 
   # Perform ggplot and show the count of frames for each motif in the selected event_ID
   ggplot(filtered_data %>% group_by(group) %>% count(), aes(x = factor(group), y = n)) +
-  geom_segment(aes(x = factor(group), xend = factor(group), y = 0, yend = n), color = "black") +
-  geom_point(size = 4, color = "black") +
+  geom_segment(aes(x = factor(group), xend = factor(group), y = 0, yend = n), color = "#264653") +
+  geom_point(size = 4, color = "#e9c46a") +
   labs(color = "Species") +
   xlab("Motif Number") +
   ylab("Number of Frames") +
-  coord_flip()
+  coord_flip()+
+  theme_light()
+})
+
+output$time_motif_plot <- renderPlot({
+  # Access the filtered data using filtered_data()
+  filtered_data <- filtered_data()
+
+  ggplot(filtered_data, aes(x=factor(group), y=minute)) + 
+    geom_boxplot(alpha=0.3, fill="#e76f51") +
+    theme(legend.position="none") +
+    xlab("Motif Number") +
+    ylab("Start and End (minutes)")+
+    theme_light()
 })
 
 }
