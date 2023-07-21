@@ -29,7 +29,7 @@ theme_update(
   plot.background = element_rect(fill = "grey98", color = "grey98"),
   panel.background = element_rect(fill = "grey98", color = "grey98"),
   strip.background = element_rect(fill='grey98', color = "grey98"),
-  panel.border = element_rect(color='#e1dfdf', fill= NA, size=1),
+  panel.border = element_rect(color='#e1dfdf', fill= NA, linewidth=1),
   # Customize title appearence
   plot.title = element_text(
     color = "#404E4D", 
@@ -54,7 +54,7 @@ theme_update(
     hjust = 0,
     margin = margin(t = 40)), # Large margin on the top of the caption.
   # Remove legend
-  legend.position = "none",
+  legend.position = "right",
   legend.background = element_rect(fill = 'grey98', color = NA), 
   legend.title = element_text(color = "#404E4D", size= 20),
   legend.text =  element_text(color = "#404E4D", size= 18))
