@@ -170,9 +170,9 @@ output$motif_count_plot <- renderPlot({
 })
 
 output$time_motif_plot <- renderPlot({
-  ggplot(filtered_data(), aes(x=factor(group), y=minute)) + 
-    geom_boxplot(coef = 0, outlier.shape = NA, alpha=0.3, fill="#631fa6") +
-    theme(legend.position="none") +
+  ggplot(filtered_data(), aes(x = factor(group), y = minute)) + 
+    geom_boxplot(coef = 0, outlier.shape = NA, alpha = 0.3, fill = "#631fa6") +
+    theme(legend.position = "none") +
     xlab("Motif Number") +
     ylab("Start and End (minutes)") +
     theme_light()
