@@ -3,7 +3,7 @@ suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(shinydashboard))
 suppressPackageStartupMessages(library(arrow))
 suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(ggridges))
+#suppressPackageStartupMessages(library(ggridges))
 
 #-- UI -------------------------------------------------------------------------#
 ui <- dashboardPage(
@@ -12,7 +12,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     # Add a text box with key explanation
     div(style = "border: 1px solid #ccc; padding: 10px; margin-top: 10px;",
-        p("Welcome to the Lobster Predation Behaviour Dashboard!"),
+        p("Welcome to the Rock Lobster Predation Behaviour Dashboard!"),
         #p("Use the sidebar menu to navigate between different sections."),
         p("Select a tank from the radio buttons and an event ID from the dropdown."),
         #p("Explore the data and visualizations for each section.")
@@ -42,13 +42,13 @@ ui <- dashboardPage(
               collapsible = TRUE,
               collapsed = TRUE,
               #h1("💡About"),
-              p("This research project focuses on understanding the predation behavior between lobsters and sea urchins in Tasmanian waters, 
-                which are experiencing significant warming and species redistribution. The long-spined sea urchin, Centrostephanus rodgersii, 
+              p("This research project focuses on understanding the predation behavior between southern rock lobsters and sea urchins in Tasmanian waters, 
+                which are experiencing significant warming and species redistribution. The long-spined sea urchin, <i>Centrostephanus rodgersii</i>, 
                 has extended its range in Tasmanian coastal waters, leading to over-grazing and unproductive barren habitats."),
-              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of C. rodgersii in its natural range. 
-                However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the eastern rock lobster"),
+              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of <i>C. rodgersii</i> in its natural range. 
+                However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the southern rock lobster."),
               p("This dashboard allows you to explore the data collected from the experiments and visualize the results."),
-              p("@slopezmarcano and @jesmith5")
+              p("Data collection + Science by @jesmith5 and Data Science by @slopezmarcano from University of Tasmania and Griffith University; Australia."),
               # Add an image for the "About" section that is located in the assets folder
               # img(src = "https://www.dpi.nsw.gov.au/__data/assets/image/0018/117540/lobster.jpg", height = 200, width = 200, align = "center")
             )
@@ -79,14 +79,14 @@ server <- function(input, output, session) {
       "Tank 2" = c("2_N1", "2_N3", "2_N4", "2_N5", "2_N6", "2_N8", "2_N9", "2_N10", "2_N11", "2_N12", "2_N13", "2_N14", "2_N15"),
       "Tank 3" = c("3_N1", "3_N3", "3_N4", "3_N5", "3_N6", "3_N7", "3_N8", "3_N9", "3_N10", "3_N11", "3_N13", "3_N15"),
       "Tank 4" = c("4_N1", "4_N3", "4_N4", "4_N5", "4_N6", "4_N7", "4_N8", "4_N9", "4_N10", "4_N12", "4_N13", "4_N15"),
-      "Tank 5" = c("5_N2", "5_N4", "5_N5", "5_N6", "5_N10", "5_N11", "5_N12", "5_N13", "5_N14", "5_N15"),
+      "Tank 5" = c("5_N2", "5_N4", "5_N5", "5_N6", "5_N7", "5_N8", "5_N9", "5_N10", "5_N11", "5_N12", "5_N13", "5_N14", "5_N15"),
       "Tank 6" = c("6_N3", "6_N4", "6_N5", "6_N6", "6_N7", "6_N8", "6_N9", "6_N10", "6_N11", "6_N12", "6_N14", "6_N15"), 
-      "Tank 7" = c("7_N3", "7_N5", "7_N7", "7_N9", "7_N10", "7_N11", "7_N12", "7_N13", "7_N14", "7_N15"))
+      "Tank 7" = c("7_N3", "7_N5","7_N6", "7_N7", "7_N9", "7_N10", "7_N11", "7_N12", "7_N13", "7_N14", "7_N15"))
     updateSelectInput(session, "event_id", choices = event_ids)
   })
 
   # Load the functions
-  source('scripts/final_functions.R')
+  #source('scripts/final_functions.R')
   
   # Load the ggpplot themes
   #source('scripts/templates/yyy_theme_setup.R')
@@ -99,11 +99,9 @@ server <- function(input, output, session) {
   filtered_data <- reactive({
     req(input$event_id) # Ensure an event_id is selected before proceeding
     
-    # Read the data with the selected event_ID, establish the correct frames, select important columns
-      data1 <- read_and_join_all_parquet_files('/Users/s2985905/Dropbox/GithubRepos/utas-lobster-predation/data/merged') %>%
-              filter(event_ID==input$event_id) %>%
-              corrected_frames() %>%
-              select(event_ID, category_id, correct_frame, cx, cy) 
+    # Read the data with the selected event_ID
+      data1 <- read_parquet('www/data.parquet') %>%
+              filter(event_ID==input$event_id)
 
       # Determine the min and max interaction frames for the selected event_ID
       frames <- data1 %>%
@@ -136,11 +134,7 @@ server <- function(input, output, session) {
   
   # Create the plot based on the reactive filtered data
   output$interaction_plot <- renderPlot({
-    # Access the filtered data using filtered_data()
-    filtered_data <- filtered_data()
-    
-    # Perform ggplot and plot the cx and cy coordinates, color by correct_subgroup, and shape by category_id
-    ggplot(filtered_data %>% filter(n >=20), aes(x = cx, y = cy, color = correct_subgroup, shape = as.factor(category_id))) +
+    ggplot(filtered_data() %>% filter(n >=20), aes(x = cx, y = cy, color = correct_subgroup, shape = as.factor(category_id))) +
     geom_point(
     size = 4,
     alpha = 1) +
@@ -166,11 +160,7 @@ output$possible_predation_output <- renderInfoBox({
 })
 
 output$motif_count_plot <- renderPlot({
-  # Access the filtered data using filtered_data()
-  filtered_data <- filtered_data()
-
-  # Perform ggplot and show the count of frames for each motif in the selected event_ID
-  ggplot(filtered_data %>% group_by(group) %>% count(), aes(x = factor(group), y = n)) +
+  ggplot(filtered_data() %>% group_by(group) %>% count(), aes(x = factor(group), y = n)) +
   geom_segment(aes(x = factor(group), xend = factor(group), y = 0, yend = n), color = "#631fa6") +
   geom_point(size = 4, color = "#631fa6") +
   labs(color = "Species") +
@@ -181,11 +171,8 @@ output$motif_count_plot <- renderPlot({
 })
 
 output$time_motif_plot <- renderPlot({
-  # Access the filtered data using filtered_data()
-  filtered_data <- filtered_data()
-
-  ggplot(filtered_data, aes(x=factor(group), y=minute)) + 
-    geom_boxplot(alpha=0.3, fill="#631fa6") +
+  ggplot(filtered_data(), aes(x=factor(group), y=minute)) + 
+    geom_boxplot(coef = 0, outlier.shape = NA, alpha=0.3, fill="#631fa6") +
     theme(legend.position="none") +
     xlab("Motif Number") +
     ylab("Start and End (minutes)")+
