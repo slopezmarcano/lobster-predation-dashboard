@@ -43,9 +43,9 @@ ui <- dashboardPage(
               collapsed = TRUE,
               #h1("💡About"),
               p("This research project focuses on understanding the predation behavior between southern rock lobsters and sea urchins in Tasmanian waters, 
-                which are experiencing significant warming and species redistribution. The long-spined sea urchin, <i>Centrostephanus rodgersii</i>, 
+                which are experiencing significant warming and species redistribution. The long-spined sea urchin, Centrostephanus rodgersii, 
                 has extended its range in Tasmanian coastal waters, leading to over-grazing and unproductive barren habitats."),
-              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of <i>C. rodgersii</i> in its natural range.However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the southern rock lobster."),
+              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of C. rodgersii in its natural range.However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the southern rock lobster."),
               p("This dashboard allows you to explore the data collected from the experiments and visualize the results."),
               p("Data collection + Science by @jesmith5 and Data Science by @slopezmarcano from University of Tasmania and Griffith University; Australia.")
               # Add an image for the "About" section that is located in the assets folder
