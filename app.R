@@ -8,7 +8,7 @@ suppressPackageStartupMessages(library(tidyverse))
 #-- UI -------------------------------------------------------------------------#
 ui <- dashboardPage(
   skin = "purple",
-  dashboardHeader(title = "🦞Lobster Predation Behaviour"), 
+  dashboardHeader(title = "🦞Lobster Predation Behaviour"),
   dashboardSidebar(
     # Add a text box with key explanation
     div(style = "border: 1px solid #ccc; padding: 10px; margin-top: 10px;",
@@ -45,10 +45,9 @@ ui <- dashboardPage(
               p("This research project focuses on understanding the predation behavior between southern rock lobsters and sea urchins in Tasmanian waters, 
                 which are experiencing significant warming and species redistribution. The long-spined sea urchin, <i>Centrostephanus rodgersii</i>, 
                 has extended its range in Tasmanian coastal waters, leading to over-grazing and unproductive barren habitats."),
-              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of <i>C. rodgersii</i> in its natural range. 
-                However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the southern rock lobster."),
+              p("Rock lobsters are important predators of sea urchins, with the eastern rock lobster being a significant predator of <i>C. rodgersii</i> in its natural range.However, eastern rock lobsters are uncommon in Tasmania. This research aims to test the relative predation of urchins by the southern rock lobster."),
               p("This dashboard allows you to explore the data collected from the experiments and visualize the results."),
-              p("Data collection + Science by @jesmith5 and Data Science by @slopezmarcano from University of Tasmania and Griffith University; Australia."),
+              p("Data collection + Science by @jesmith5 and Data Science by @slopezmarcano from University of Tasmania and Griffith University; Australia.")
               # Add an image for the "About" section that is located in the assets folder
               # img(src = "https://www.dpi.nsw.gov.au/__data/assets/image/0018/117540/lobster.jpg", height = 200, width = 200, align = "center")
             )
@@ -175,7 +174,7 @@ output$time_motif_plot <- renderPlot({
     geom_boxplot(coef = 0, outlier.shape = NA, alpha=0.3, fill="#631fa6") +
     theme(legend.position="none") +
     xlab("Motif Number") +
-    ylab("Start and End (minutes)")+
+    ylab("Start and End (minutes)") +
     theme_light()
 })
 
