@@ -180,4 +180,5 @@ output$time_motif_plot <- renderPlot({
 
 }
 
+# Run the application
 runApp(shinyApp(ui, server))
