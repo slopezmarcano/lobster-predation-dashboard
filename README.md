@@ -1,7 +1,10 @@
-# Dashboard to review Lobster-Urchin predation events
+# Integrated data visualisation tools: Automated analysis of predation events between lobsters and sea urchins
+
+## Context
+This research project focuses on understanding the predation behavior between southern rock lobsters and sea urchins in Tasmanian waters, which are experiencing significant warming and species redistribution. The project tested the relative predation of urchins by the southern rock lobster. Data collection + Science by @jesmith5 University of Tasmania and Data Science by @slopezmarcano from FishiD-Griffith University, Australia.
 
 ## Description
-This dashboard is designed to allow users to review the predation events that have been identified by the Lobster-Urchin project. The dashboard is built using the R package `shiny` and is hosted on the [shinyapps.io](https://www.shinyapps.io/) platform. The dashboard can be accessed at the following link: https://lobster-urchin.shinyapps.io/predation_dashboard/
+This dashboard is designed to allow users to review the predation events that have been identified by the Lobster-Urchin project. The dashboard is built using the R package `shiny`. 
 
 ## Data
 The data used to build this dashboard is a parquet file that contains millions of AI detections. An AI was trained to detect urchins and lobsters from the laboratory videos collected by UTAS colleagues. For every frame of the video, the x and y coordinates of the object were exported.
